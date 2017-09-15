@@ -1,6 +1,12 @@
 import Vapor
 
 extension Droplet {
+    
+    struct Foo: Codable {
+        let dd: String
+    }
+    
+    
     func setupRoutes() throws {
         get("hello") { req in
             var json = JSON()
