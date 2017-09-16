@@ -33,14 +33,28 @@ extension Droplet {
     }
 
     func test() {
-        print("dfd")
-        let encoder = JSONEncoder()
-        let data = Foo(dd: "df")
         do {
-            try encoder.encode(data)
-        } catch {
+//            let url = "http://10.0.0.9:8099/ss.json"
+//            let url = "https://www.twitter.com"
+            let url = "https://hacker-news.firebaseio.com/v0/topstories.json"
+            let res = try self.client.get(url)
+            let rawBytes = res.body.bytes!
+
+            let json = try JSON(bytes: rawBytes)
+            let count = json.array?.count
+            print("Got JSON: \(json) \(count)")
+        } catch  {
             print(error)
         }
+       
+        print("dfd")
+//        let encoder = JSONEncoder()
+//        let data = Foo(dd: "df")
+//        do {
+//            try encoder.encode(data)
+//        } catch {
+//            print(error)
+//        }
         print("okk")
     }
 }
