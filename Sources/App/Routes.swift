@@ -3,10 +3,7 @@ import  Foundation
 
 extension Droplet {
     
-    struct Foo: Codable {
-        let dd: String
-
-    }
+  
     
     
     func setupRoutes() throws {
