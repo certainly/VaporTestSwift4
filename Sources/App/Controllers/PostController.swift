@@ -106,10 +106,11 @@ final class PostController {
             Timelog.start()
             print("test beging")
 //            let url = "http://0.0.0.0:8083/ss.json"
-            #if os(Linux)
-                let prefix = ""
-            #else
+            #if DEBUG
                 let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
+             
+            #else
+                   let prefix = ""
             #endif
             
             let originalurl = "https://hacker-news.firebaseio.com/v0/topstories.json"
@@ -118,15 +119,20 @@ final class PostController {
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 5 ) {
 //                // do stuff 42 seconds later
 //                print("out now")
-//               
+//
 //            }
              Timelog.stop()
             
             let rawBytes = res?.body.bytes!
-            
+//            res.
             let json = try JSON(bytes: rawBytes!)
             let count = json.array?.count
 //            print("Got JSON: \(json) \(count)")
+            guard let array = json.array else { return  }
+            
+            for item in array[0..<3] {
+                print(item)
+            }
         } catch  {
             print(error)
         }
