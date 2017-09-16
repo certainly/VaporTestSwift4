@@ -102,10 +102,15 @@ final class PostController {
     
     func test() {
         do {
+            Timelog.log()
             print("test beging")
 //            let url = "http://0.0.0.0:8083/ss.json"
-            let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
-            //            let url = "https://www.twitter.com"
+            #if os(Linux)
+                let prefix = ""
+            #else
+                let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
+            #endif
+            
             let originalurl = "https://hacker-news.firebaseio.com/v0/topstories.json"
             let url = prefix + originalurl
             let res = try drop?.client.get(url)
