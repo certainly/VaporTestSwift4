@@ -131,7 +131,7 @@ final class PostController {
             guard let array = json.array else { return  }
             
             for item in array[0..<3] {
-                print(item)
+                print(item.int)
             }
         } catch  {
             print(error)
