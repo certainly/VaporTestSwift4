@@ -108,7 +108,7 @@ final class PostController {
 //            let url = "http://0.0.0.0:8083/ss.json"
             #if DEBUG
                 let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
-             
+                print("Debug flag on")
             #else
                    let prefix = ""
             #endif
