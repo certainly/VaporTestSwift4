@@ -3,9 +3,16 @@ import HTTP
 
 /// Here we have a controller that helps facilitate
 /// RESTful interactions with our Posts table
-final class PostController: ResourceRepresentable {
+final class PostController {
     /// When users call 'GET' on '/posts'
     /// it should return an index of all available posts
+    
+    var drop: Droplet?
+    
+    func setDroplet(drop: Droplet){
+        self.drop = drop
+    }
+    
     func index(_ req: Request) throws -> ResponseRepresentable {
         return try Post.all().makeJSON()
     }
@@ -20,9 +27,9 @@ final class PostController: ResourceRepresentable {
 
     /// When the consumer calls 'GET' on a specific resource, ie:
     /// '/posts/13rd88' we should show that specific post
-    func show(_ req: Request, post: Post) throws -> ResponseRepresentable {
-        return post
-    }
+//    func show(_ req: Request, post: Post) throws -> ResponseRepresentable {
+//        return post
+//    }
 
     /// When the consumer calls 'DELETE' on a specific resource, ie:
     /// 'posts/l2jd9' we should remove that resource from the database
@@ -66,20 +73,53 @@ final class PostController: ResourceRepresentable {
         return post
     }
 
-    /// When making a controller, it is pretty flexible in that it
-    /// only expects closures, this is useful for advanced scenarios, but
-    /// most of the time, it should look almost identical to this 
-    /// implementation
-    func makeResource() -> Resource<Post> {
-        return Resource(
-            index: index,
-            store: store,
-            show: show,
-            update: update,
-            replace: replace,
-            destroy: delete,
-            clear: clear
-        )
+    func addRoutes(to routeBuilder: RouteBuilder) {
+        routeBuilder.get("all", handler: all)
+        test()
+//        routeBuilder.post("create", handler: create)
+//        routeBuilder.get(Post.parameter, handler: show)
+    }
+    
+//    /// When making a controller, it is pretty flexible in that it
+//    /// only expects closures, this is useful for advanced scenarios, but
+//    /// most of the time, it should look almost identical to this
+//    /// implementation
+//    func makeResource() -> Resource<Post> {
+//        return Resource(
+//            index: index,
+//            store: store,
+//            show: show,
+//            update: update,
+//            replace: replace,
+//            destroy: delete,
+//            clear: clear
+//        )
+//    }
+    func all(request: Request) throws -> ResponseRepresentable {
+//        test()
+        return try Post.all().makeJSON()
+    }
+    
+    func test() {
+        do {
+            print("test beging")
+//            let url = "http://0.0.0.0:8083/ss.json"
+            let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
+            //            let url = "https://www.twitter.com"
+            let originalurl = "https://hacker-news.firebaseio.com/v0/topstories.json"
+            let url = prefix + originalurl
+            let res = try drop?.client.get(url)
+            let rawBytes = res?.body.bytes!
+            
+            let json = try JSON(bytes: rawBytes!)
+            let count = json.array?.count
+            print("Got JSON: \(json) \(count)")
+        } catch  {
+            print(error)
+        }
+        
+        print("testover")
+        
     }
 }
 
