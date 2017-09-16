@@ -1,6 +1,7 @@
 import Vapor
 import HTTP
 import Dispatch
+import Foundation
 
 /// Here we have a controller that helps facilitate
 /// RESTful interactions with our Posts table
@@ -121,7 +122,7 @@ final class PostController {
 //                print("out now")
 //
 //            }
-             Timelog.stop()
+            
             
             let rawBytes = res?.body.bytes!
 //            res.
@@ -130,9 +131,20 @@ final class PostController {
 //            print("Got JSON: \(json) \(count)")
             guard let array = json.array else { return  }
             
-            for item in array[0..<3] {
+            for item in array[0..<10] {
                 print(item.int)
+                var itemURL = "https://hacker-news.firebaseio.com/v0/item/"
+                itemURL = prefix + itemURL + "\(item.int!).json"
+                let res2 = try drop?.client.get(itemURL)
+                let rawBytes = res2?.body.bytes!
+              
+                let json = try JSON(bytes: rawBytes!)
+                
+
+                
+//                print(str)
             }
+            Timelog.stop()
         } catch  {
             print(error)
         }
