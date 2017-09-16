@@ -1,5 +1,6 @@
 import Vapor
 import HTTP
+import Dispatch
 
 /// Here we have a controller that helps facilitate
 /// RESTful interactions with our Posts table
@@ -102,7 +103,7 @@ final class PostController {
     
     func test() {
         do {
-            Timelog.log()
+            Timelog.start()
             print("test beging")
 //            let url = "http://0.0.0.0:8083/ss.json"
             #if os(Linux)
@@ -114,11 +115,18 @@ final class PostController {
             let originalurl = "https://hacker-news.firebaseio.com/v0/topstories.json"
             let url = prefix + originalurl
             let res = try drop?.client.get(url)
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 5 ) {
+//                // do stuff 42 seconds later
+//                print("out now")
+//               
+//            }
+             Timelog.stop()
+            
             let rawBytes = res?.body.bytes!
             
             let json = try JSON(bytes: rawBytes!)
             let count = json.array?.count
-            print("Got JSON: \(json) \(count)")
+//            print("Got JSON: \(json) \(count)")
         } catch  {
             print(error)
         }
