@@ -101,8 +101,11 @@ final class PostController {
 //        test()
         return try Post.all().makeJSON()
     }
+    
+
+    
     func test() {
-        let ee: Data 
+      
         fetch()
     }
     
@@ -142,8 +145,19 @@ final class PostController {
                 let res2 = try drop?.client.get(itemURL)
                 let rawBytes = res2?.body.bytes!
               
-                let json = try JSON(bytes: rawBytes!)
                 
+//                dump(json)
+                do {
+                    let json = try JSON(bytes: rawBytes!)
+                    let post = try Post(withHNSource: json)
+                     try post.save()
+                } catch {
+//                    dump(json)
+                    print(error)
+                    throw Abort(.badRequest, reason: "incorrect json")
+                }
+                
+               
 
                 
 //                print(str)

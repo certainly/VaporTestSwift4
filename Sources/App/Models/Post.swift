@@ -8,18 +8,37 @@ final class Post: Model {
     // MARK: Properties and database keys
     
     /// The content of the post
-//    var cid: Int
+    var cid: Int
     var content: String
-//    var time: Double
+    var time: Double
+    var source: String
+    var kids: String
+    var other: String
     
     
     /// The column names for `id` and `content` in the database
     static let idKey = "id"
+    static let cidKey = "cid"
     static let contentKey = "content"
+    static let timeKey = "time"
+    static let sourceKey = "source"
+    static let kidsKey = "kids"
+    static let otherKey = "other"
+    
 
     /// Creates a new Post
-    init(content: String) {
+    init(cid: Int, content: String, time: Double, source: String, kids: String, other: String) {
+        self.cid  = cid
         self.content = content
+        self.time = time
+        self.source = source
+        self.kids = kids
+        self.other = other
+    }
+    
+    convenience init(withHNSource src: JSON) throws {
+       try self.init(cid: src.get("id"), content: src.get("title"), time: src.get("time"), source: "HN",
+                     kids: Util.intArrayToString(src.get("kids") ?? []), other: "")
     }
 
     // MARK: Fluent Serialization
@@ -27,17 +46,29 @@ final class Post: Model {
     /// Initializes the Post from the
     /// database row
     init(row: Row) throws {
+        cid = try row.get(Post.cidKey)
         content = try row.get(Post.contentKey)
+        time = try row.get(Post.timeKey)
+        source = try row.get(Post.sourceKey)
+        kids = try row.get(Post.kidsKey)
+        other = try row.get(Post.otherKey)
+       
     }
 
     // Serializes the Post to the database
     func makeRow() throws -> Row {
         var row = Row()
-        try row.set(Post.contentKey, content)
+        try row.set(Post.cidKey, cid)
+         try row.set(Post.contentKey, content)
+         try row.set(Post.timeKey, time)
+         try row.set(Post.sourceKey, source)
+         try row.set(Post.kidsKey, kids)
+         try row.set(Post.otherKey, other)
         return row
     }
+    
+    
 }
-
 // MARK: Fluent Preparation
 
 extension Post: Preparation {
@@ -46,7 +77,13 @@ extension Post: Preparation {
     static func prepare(_ database: Database) throws {
         try database.create(self) { builder in
             builder.id()
+            builder.int(Post.cidKey)
             builder.string(Post.contentKey)
+//            builder.
+            builder.string(Post.kidsKey)
+            builder.string(Post.sourceKey)
+            builder.string(Post.otherKey)
+            builder.double(Post.timeKey)
         }
     }
 
@@ -66,14 +103,23 @@ extension Post: Preparation {
 extension Post: JSONConvertible {
     convenience init(json: JSON) throws {
         try self.init(
-            content: json.get(Post.contentKey)
+            cid: json.get(Post.cidKey),
+            content: json.get(Post.contentKey),
+            time: json.get(Post.timeKey),
+            source: json.get(Post.sourceKey),
+             kids: json.get(Post.kidsKey),
+              other: json.get(Post.otherKey)
         )
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
-        try json.set(Post.idKey, id)
+        try json.set(Post.cidKey, cid)
         try json.set(Post.contentKey, content)
+        try json.set(Post.timeKey, time)
+        try json.set(Post.sourceKey, source)
+        try json.set(Post.kidsKey, kids)
+        try json.set(Post.otherKey , other)
         return json
     }
 }
