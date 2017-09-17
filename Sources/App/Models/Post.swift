@@ -38,7 +38,7 @@ final class Post: Model {
     
     convenience init(withHNSource src: JSON) throws {
        try self.init(cid: src.get("id"), content: src.get("title"), time: src.get("time"), source: "HN",
-                     kids: Util.intArrayToString(src.get("kids") ?? []), other: "")
+                     kids: Util.intArrayToString(src.get("kids") ?? []), other: (src.get("url") ?? ""))
     }
 
     // MARK: Fluent Serialization
