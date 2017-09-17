@@ -109,7 +109,36 @@ final class PostController {
         fetch()
     }
     
-    func fetch() {
+    func fetch(){
+//        fetchHNList()
+        fetchV2List()
+    }
+    
+    
+    func fetchV2List()  {
+        Timelog.start()
+        let url = "https://www.v2ex.com/api/topics/show.json?node_name=apple"
+        do {
+            let res = try drop?.client.get(url)
+            let rawBytes = res?.body.bytes!
+            let json = try JSON(bytes: rawBytes!)
+            
+            guard let array = json.array else { return  }
+            for item in array {
+                let  tt: String = try item.get("title")
+                print(tt)
+                let post = try Post(withV2Source: item)
+                try post.save()
+            }
+        } catch  {
+            print(error)
+        }
+
+        Timelog.stop()
+    }
+    
+    
+    func fetchHNList() {
         do {
             Timelog.start()
             print("test beging")
@@ -124,15 +153,7 @@ final class PostController {
             let originalurl = "https://hacker-news.firebaseio.com/v0/topstories.json"
             let url = prefix + originalurl
             let res = try drop?.client.get(url)
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 5 ) {
-//                // do stuff 42 seconds later
-//                print("out now")
-//
-//            }
-            
-            
             let rawBytes = res?.body.bytes!
-//            res.
             let json = try JSON(bytes: rawBytes!)
             let count = json.array?.count
 //            print("Got JSON: \(json) \(count)")
@@ -144,23 +165,11 @@ final class PostController {
                 itemURL = prefix + itemURL + "\(item.int!).json"
                 let res2 = try drop?.client.get(itemURL)
                 let rawBytes = res2?.body.bytes!
-              
-                
-//                dump(json)
-                do {
+
+               
                     let json = try JSON(bytes: rawBytes!)
                     let post = try Post(withHNSource: json)
                      try post.save()
-                } catch {
-//                    dump(json)
-                    print(error)
-                    throw Abort(.badRequest, reason: "incorrect json")
-                }
-                
-               
-
-                
-//                print(str)
             }
             Timelog.stop()
         } catch  {
