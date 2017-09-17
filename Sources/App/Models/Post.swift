@@ -8,7 +8,10 @@ final class Post: Model {
     // MARK: Properties and database keys
     
     /// The content of the post
+//    var cid: Int
     var content: String
+//    var time: Double
+    
     
     /// The column names for `id` and `content` in the database
     static let idKey = "id"

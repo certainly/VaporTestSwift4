@@ -101,8 +101,12 @@ final class PostController {
 //        test()
         return try Post.all().makeJSON()
     }
-    
     func test() {
+        let ee: Data 
+        fetch()
+    }
+    
+    func fetch() {
         do {
             Timelog.start()
             print("test beging")
