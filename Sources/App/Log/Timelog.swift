@@ -2,16 +2,31 @@ import Foundation
 
 class Timelog  {
     private static var  startTime: TimeInterval?
-    static func start() {
+    private static var  dict: [String: TimeInterval] = [:]
+    static func start(_ flag: String = "") {
         let now = Date()
-        startTime = now.timeIntervalSince1970
-        print("start timer... ")
+        if flag == "" {
+            startTime = now.timeIntervalSince1970
+        } else {
+            dict[flag] = now.timeIntervalSince1970
+        }
+        
+        
+        
+        print("start timer \(flag)  ...  ")
     }
     
-    static func stop() {
+    static func stop(_ flag: String = "") {
         let now = Date()
         let endTime = now.timeIntervalSince1970
-        let cost =  endTime - startTime!
-        print("cost time: \(cost)")
+        let startPoint: TimeInterval
+        if flag == "" {
+            startPoint = startTime!
+        } else {
+            startPoint = dict[flag]!
+        }
+        
+        let cost =  endTime - startPoint
+        print("cost time for \(flag) : \(cost)")
     }
 }

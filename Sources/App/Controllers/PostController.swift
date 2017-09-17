@@ -77,6 +77,7 @@ final class PostController {
 
     func addRoutes(to routeBuilder: RouteBuilder) {
         routeBuilder.get("all", handler: all)
+        routeBuilder.get("sort", handler: sort)
         test()
 //        routeBuilder.post("create", handler: create)
 //        routeBuilder.get(Post.parameter, handler: show)
@@ -102,6 +103,11 @@ final class PostController {
         return try Post.all().makeJSON()
     }
     
+    func sort(request: Request) throws -> ResponseRepresentable {
+       let query = try Post.makeQuery()
+        return try query.sort("time", .descending).all().makeJSON()
+    }
+    
 
     
     func test() {
@@ -110,8 +116,10 @@ final class PostController {
     }
     
     func fetch(){
-//        fetchHNList()
+        Timelog.start("fetch")
+        fetchHNList()
         fetchV2List()
+        Timelog.stop("fetch")
     }
     
     
