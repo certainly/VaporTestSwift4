@@ -132,8 +132,8 @@ final class PostController {
     
     func fetchDetail(_ aId: String){
         //fetch v2ex comments
-        let url = "https://www.v2ex.com/api/replies/show.json?topic_id=" + aId
-        fetchDataImpl(url: url, type: SourceType.V2comment)
+     
+        fetchDataImpl(cid: aId, type: SourceType.V2comment)
         
         
     }
@@ -161,15 +161,28 @@ final class PostController {
     }
     
     
-    func fetchDataImpl(url: String,type: SourceType) {
+    func fetchDataImpl(cid: String? = nil,type: SourceType) {
         Timelog.start()
+        let url: String?
+        switch type {
+        case .V2:
+            url =  "https://www.v2ex.com/api/topics/show.json?node_name=apple"
+        case .V2comment:
+            url = "https://www.v2ex.com/api/replies/show.json?topic_id=" + cid!
+        default:
+            url = ""
+            break
+        }
+        
        
         do {
-            let res = try drop?.client.get(url)
+            print("url == \(url)")
+            let res = try drop?.client.get(url!)
             let rawBytes = res?.body.bytes!
             let json = try JSON(bytes: rawBytes!)
             
             guard let array = json.array else { return  }
+            print("count: \(array.count)")
             for item in array {
                 
                 
@@ -180,7 +193,7 @@ final class PostController {
                     print(tt)
                      post = try Post(withV2Source: item)
                 case .V2comment:
-                     post = try Post(withV2Comments: item)
+                    post = try Post(withV2Comments: item, cid: cid!)
                 default:
                   
                     break
@@ -200,9 +213,9 @@ final class PostController {
 
     
     func fetchV2List()  {
-        let url = "https://www.v2ex.com/api/topics/show.json?node_name=apple"
+       
         let type = SourceType.V2
-        fetchDataImpl(url: url, type: type)
+        fetchDataImpl( type: type)
     }
     
     

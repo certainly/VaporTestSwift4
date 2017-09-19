@@ -52,10 +52,10 @@ final class Post: Model {
                       kids: "", other:  src.get("content") ?? "")
     }
     
-    convenience init(withV2Comments src: JSON) throws {
+    convenience init(withV2Comments src: JSON, cid: String) throws {
         try self.init(cid: src.get("id"), content: src.get("content"), time: src.get("created"),
                       source: SourceType.V2comment.rawValue,
-                      kids: "", other:   "")
+                      kids: "", other:   cid)
     }
     
     // MARK: Fluent Serialization
