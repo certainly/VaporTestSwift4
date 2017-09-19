@@ -122,18 +122,33 @@ final class PostController {
     func detail(request: Request) throws -> ResponseRepresentable {
         let cid = request.headers["cid"]
         print("cid = \(cid)")
+       
         if let id = cid {
-            try  fetchDetail(id)
+            
+            try  fetchDetail(id, type: .V2comment)
+           
+            return try  Post.makeQuery().filter("other" , cid).all().makeJSON()
+        } else if let kids = request.headers["kids"] {
+            print("kids = \(kids)")
+            for kid in kids {
+//                try  fetchDetail(kid, type: .HNcomment)
+            }
+            
+//            fetchDetailKids(kids)
+            
         }
         
+        return try  Post.makeQuery().filter("source", in: [SourceType.HNcomment.rawValue]).sort("time", .descending).all().makeJSON()
        
-        return try  Post.makeQuery().filter("source", in: [SourceType.V2comment.rawValue]).sort("time", .descending).all().makeJSON()
+        
     }
     
-    func fetchDetail(_ aId: String) throws {
+    
+    
+    func fetchDetail(_ aId: String, type: SourceType) throws {
         //fetch v2ex comments
-        try Post.makeQuery().filter("source", in: [SourceType.V2comment.rawValue]).delete()
-        fetchDataImpl(cid: aId, type: SourceType.V2comment)
+        try Post.makeQuery().filter("source", in: [type.rawValue]).delete()
+        fetchDataImpl(cid: aId, type:type)
         
         
     }
@@ -145,7 +160,29 @@ final class PostController {
     
     func test()   {
         do {
-            try fetch()
+//
+
+            let str = "Andrew, Ben, John, Paul, Peter, Laura"
+            let array = str.components(separatedBy: ", ")
+            print("arr = \(array)")
+
+//              try  self.fetch()
+//            let result0 = try Portal<Int>.open { [weak self] portal in
+//                for i in 0...3 {
+//                        background {
+//                            print("world \(i)")
+//                        }
+//                    portal.close(with: 1)
+//                }
+////
+//            }
+            
+
+  
+            print("test over")
+            
+//            print(result)
+            
         } catch {
             print(error)
         }
@@ -240,18 +277,22 @@ final class PostController {
 //            print("Got JSON: \(json) \(count)")
             guard let array = json.array else { return  }
             
-            for item in array[0..<10] {
-                print(item.int)
-                var itemURL = "https://hacker-news.firebaseio.com/v0/item/"
-                itemURL = prefix + itemURL + "\(item.int!).json"
-                let res2 = try drop?.client.get(itemURL)
-                let rawBytes = res2?.body.bytes!
-
-               
+            
+                for item in array[0..<10] {
+                    
+                    print(item.int)
+                    var itemURL = "https://hacker-news.firebaseio.com/v0/item/"
+                    itemURL = prefix + itemURL + "\(item.int!).json"
+                    let res2 = try drop?.client.get(itemURL)
+                    let rawBytes = res2?.body.bytes!
+                    
+                    
                     let json = try JSON(bytes: rawBytes!)
                     let post = try Post(withHNSource: json)
-                     try post.save()
-            }
+                    try post.save()
+
+                }
+            
             Timelog.stop()
         } catch  {
             print(error)

@@ -6,6 +6,7 @@ enum SourceType: String {
     case V2 = "V2"
     case HN = "HN"
     case V2comment = "V2comment"
+    case HNcomment = "HNcomment"
 }
 
 final class Post: Model {
