@@ -76,9 +76,10 @@ final class PostController {
     }
 
     func addRoutes(to routeBuilder: RouteBuilder) {
-        routeBuilder.get("all", handler: all)
-        routeBuilder.get("sort", handler: sort)
-        routeBuilder.get("refresh", handler: refresh)
+        routeBuilder.post("all", handler: all)
+        routeBuilder.post("sort", handler: sort)
+        routeBuilder.post("refresh", handler: refresh)
+        routeBuilder.post("detail", handler: detail)
         test()
 //        routeBuilder.post("create", handler: create)
 //        routeBuilder.get(Post.parameter, handler: show)
@@ -101,12 +102,13 @@ final class PostController {
 //    }
     func all(request: Request) throws -> ResponseRepresentable {
 //        test()
-        return try Post.all().makeJSON()
+        
+        return try Post.makeQuery().filter("source", in: ["V2","HN"]).all().makeJSON()
     }
     
     func sort(request: Request) throws -> ResponseRepresentable {
-       let query = try Post.makeQuery()
-        return try query.sort("time", .descending).all().makeJSON()
+
+        return try  Post.makeQuery().filter("source", in: ["V2","HN"]).sort("time", .descending).all().makeJSON()
     }
     
     func refresh(request: Request) throws -> ResponseRepresentable {
@@ -116,28 +118,52 @@ final class PostController {
         return try query.sort("time", .descending).all().makeJSON()
     }
     
+    
+    func detail(request: Request) throws -> ResponseRepresentable {
+        let cid = request.headers["cid"]
+        print("cid = \(cid)")
+        if let id = cid {
+             fetchDetail(id)
+        }
+        
+       
+        return try  Post.makeQuery().filter("source", in: [SourceType.V2comment.rawValue]).sort("time", .descending).all().makeJSON()
+    }
+    
+    func fetchDetail(_ aId: String){
+        //fetch v2ex comments
+        let url = "https://www.v2ex.com/api/replies/show.json?topic_id=" + aId
+        fetchDataImpl(url: url, type: SourceType.V2comment)
+        
+        
+    }
+    
     func reset() throws {
          try Post.makeQuery().delete()
     }
 
     
-    func test() {
-      
-//        fetch()
+    func test()   {
+        do {
+            try fetch()
+        } catch {
+            print(error)
+        }
+        
     }
     
     func fetch() throws {
         try reset()
         Timelog.start("fetch")
-        fetchHNList()
+//        fetchHNList()
         fetchV2List()
         Timelog.stop("fetch")
     }
     
     
-    func fetchV2List()  {
+    func fetchDataImpl(url: String,type: SourceType) {
         Timelog.start()
-        let url = "https://www.v2ex.com/api/topics/show.json?node_name=apple"
+       
         do {
             let res = try drop?.client.get(url)
             let rawBytes = res?.body.bytes!
@@ -145,16 +171,38 @@ final class PostController {
             
             guard let array = json.array else { return  }
             for item in array {
-                let  tt: String = try item.get("title")
-                print(tt)
-                let post = try Post(withV2Source: item)
-                try post.save()
+                
+                
+                var post: Post? = nil
+                switch type  {
+                case .V2:
+                    let  tt: String = try item.get("title")
+                    print(tt)
+                     post = try Post(withV2Source: item)
+                case .V2comment:
+                     post = try Post(withV2Comments: item)
+                default:
+                  
+                    break
+                    
+                }
+                
+                
+                try post?.save()
             }
         } catch  {
             print(error)
         }
-
+        
         Timelog.stop()
+    }
+    
+
+    
+    func fetchV2List()  {
+        let url = "https://www.v2ex.com/api/topics/show.json?node_name=apple"
+        let type = SourceType.V2
+        fetchDataImpl(url: url, type: type)
     }
     
     

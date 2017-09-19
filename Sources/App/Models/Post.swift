@@ -2,6 +2,12 @@ import Vapor
 import FluentProvider
 import HTTP
 
+enum SourceType: String {
+    case V2 = "V2"
+    case HN = "HN"
+    case V2comment = "V2comment"
+}
+
 final class Post: Model {
     let storage = Storage()
     
@@ -44,6 +50,12 @@ final class Post: Model {
     convenience init(withV2Source src: JSON) throws {
         try self.init(cid: src.get("id"), content: src.get("title"), time: src.get("last_modified"), source: "V2",
                       kids: "", other:  src.get("content") ?? "")
+    }
+    
+    convenience init(withV2Comments src: JSON) throws {
+        try self.init(cid: src.get("id"), content: src.get("content"), time: src.get("created"),
+                      source: SourceType.V2comment.rawValue,
+                      kids: "", other:   "")
     }
     
     // MARK: Fluent Serialization
