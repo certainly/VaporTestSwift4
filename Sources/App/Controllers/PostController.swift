@@ -123,16 +123,16 @@ final class PostController {
         let cid = request.headers["cid"]
         print("cid = \(cid)")
         if let id = cid {
-             fetchDetail(id)
+            try  fetchDetail(id)
         }
         
        
         return try  Post.makeQuery().filter("source", in: [SourceType.V2comment.rawValue]).sort("time", .descending).all().makeJSON()
     }
     
-    func fetchDetail(_ aId: String){
+    func fetchDetail(_ aId: String) throws {
         //fetch v2ex comments
-     
+        try Post.makeQuery().filter("source", in: [SourceType.V2comment.rawValue]).delete()
         fetchDataImpl(cid: aId, type: SourceType.V2comment)
         
         
