@@ -102,13 +102,13 @@ final class PostController {
 //    }
     func all(request: Request) throws -> ResponseRepresentable {
 //        test()
-        
-        return try Post.makeQuery().filter("source", in: ["V2","HN"]).all().makeJSON()
+        let rawFilter = "source IN ( 'V2','HN')"
+        return try Post.makeQuery().filter(raw: rawFilter).all().makeJSON()
     }
     
     func sort(request: Request) throws -> ResponseRepresentable {
-
-        return try  Post.makeQuery().filter("source", in: ["V2","HN"]).sort("time", .descending).all().makeJSON()
+        let rawFilter = "source IN ( 'V2','HN')"
+        return try  Post.makeQuery().filter(raw: rawFilter).sort("time", .descending).all().makeJSON()
     }
     
     func refresh(request: Request) throws -> ResponseRepresentable {
@@ -147,7 +147,10 @@ final class PostController {
     
     func fetchDetail(_ aId: String, type: SourceType) throws {
         //fetch v2ex comments
-        try Post.makeQuery().filter("source", in: [type.rawValue]).delete()
+        try Post.makeQuery().filter("source",type.rawValue).delete()
+//        let rawFilter = "source IN [ \(type.rawValue)  ]"
+        
+//          try Post.makeQuery().filter(raw: rawFilter).delete()
         fetchDataImpl(cid: aId, type:type)
         
         
@@ -166,7 +169,7 @@ final class PostController {
             let array = str.components(separatedBy: ", ")
             print("arr = \(array)")
 
-//              try  self.fetch()
+              try  self.fetch()
 //            let result0 = try Portal<Int>.open { [weak self] portal in
 //                for i in 0...3 {
 //                        background {
