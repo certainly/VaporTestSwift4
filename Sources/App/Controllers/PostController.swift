@@ -155,7 +155,7 @@ final class PostController {
     func fetch() throws {
         try reset()
         Timelog.start("fetch")
-//        fetchHNList()
+        fetchHNList()
         fetchV2List()
         Timelog.stop("fetch")
     }
