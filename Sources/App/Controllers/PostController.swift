@@ -148,7 +148,7 @@ final class PostController {
             url = "https://www.v2ex.com/api/replies/show.json?topic_id=" + cid!
         case .HNcomment:
             #if DEBUG
-                let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
+                let prefix = "http://104.194.77.164:8083/proxy/?pxurl="
                 print("Debug flag on")
             #else
                 let prefix = ""
@@ -218,7 +218,7 @@ final class PostController {
             print("test beging")
 //            let url = "http://0.0.0.0:8083/ss.json"
             #if DEBUG
-                let prefix = "http://104.194.77.164:8080/proxy/?pxurl="
+                let prefix = "http://104.194.77.164:8083/proxy/?pxurl="
                 print("Debug flag on")
             #else
                    let prefix = ""
