@@ -59,6 +59,16 @@ final class Post: Model {
                       kids: "", other:   cid)
     }
     
+    convenience init(withHNComments src: JSON, cid: String) throws {
+        try self.init(cid: src.get("id"), content: src.get("text"), time: src.get("time"),
+                      source: SourceType.HNcomment.rawValue,
+                      kids:  Util.intArrayToString(src.get("kids") ?? []), other:  Post.removeTraiingZero(src.get("parent")))
+    }
+    
+   static private func removeTraiingZero(_ input: String) -> String {
+        return "\(Int(Float(input)!))"
+    }
+    
     // MARK: Fluent Serialization
 
     /// Initializes the Post from the
